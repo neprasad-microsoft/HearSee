@@ -3,20 +3,17 @@ package com.microsoft.garage.hearsee.activities;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
-import android.util.Log;
 
 import com.microsoft.garage.hearsee.HearSeeApplication;
 import com.microsoft.garage.hearsee.R;
 import com.microsoft.garage.hearsee.service.ImageAnalyzer;
 
-import org.slf4j.Logger;
-
 import javax.inject.Inject;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import rx.Observable;
-import rx.schedulers.Schedulers;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class MainActivity extends AppCompatActivity {
 
     @Inject
@@ -33,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
         imageAnalyzer.analyze(url)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(imageAnalysis -> {
-                    Log.d("MainActivity", "Got image analysis: " + imageAnalysis.description().toString());
+                    log.debug("Got image analysis {}", imageAnalysis.description().toString());
                 });
     }
 }
