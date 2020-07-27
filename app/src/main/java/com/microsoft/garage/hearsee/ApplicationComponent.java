@@ -2,13 +2,16 @@ package com.microsoft.garage.hearsee;
 
 import android.app.Application;
 
+import com.microsoft.garage.hearsee.activities.MainActivity;
 import com.microsoft.garage.hearsee.modules.BasicModule;
+import com.microsoft.garage.hearsee.modules.ComputerVisionModule;
 
 import dagger.BindsInstance;
 import dagger.Component;
 
 @Component(modules = {
-        BasicModule.class
+        BasicModule.class,
+        ComputerVisionModule.class
 })
 public interface ApplicationComponent {
 
@@ -19,4 +22,6 @@ public interface ApplicationComponent {
 
         ApplicationComponent build();
     }
+
+    void inject(MainActivity activity);
 }

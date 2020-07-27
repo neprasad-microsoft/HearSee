@@ -4,7 +4,7 @@ import android.app.Application;
 
 public class HearSeeApplication extends Application {
 
-    private ApplicationComponent applicationComponent;
+    public ApplicationComponent applicationComponent;
 
     @Override
     public void onCreate() {
