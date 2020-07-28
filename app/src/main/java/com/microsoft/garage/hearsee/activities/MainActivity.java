@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.Camera;
 import androidx.camera.core.CameraSelector;
+import androidx.camera.core.ImageCapture;
+import androidx.camera.core.ImageCaptureException;
 import androidx.camera.core.Preview;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
@@ -12,6 +14,7 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -21,6 +24,9 @@ import com.microsoft.garage.hearsee.HearSeeApplication;
 import com.microsoft.garage.hearsee.R;
 import com.microsoft.garage.hearsee.service.ImageAnalyzer;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
@@ -43,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
     private PreviewView viewFinder;
     private FloatingActionButton cameraCaptureButton;
     private Camera camera;
+    private ImageCapture imageCapture;
+    private final SimpleDateFormat fileFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS", Locale.US);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +60,8 @@ public class MainActivity extends AppCompatActivity {
 
         viewFinder = findViewById(R.id.viewFinder);
         cameraCaptureButton = findViewById(R.id.cameraCaptureButton);
+
+        cameraCaptureButton.setOnClickListener(button -> takePhoto());
 
         if (allPermissionsGranted()) {
             startCamera();
@@ -88,7 +98,10 @@ public class MainActivity extends AppCompatActivity {
                 CameraSelector cameraSelector = (new CameraSelector.Builder()).requireLensFacing(CameraSelector.LENS_FACING_BACK).build();
                 cameraProvider.unbindAll();
 
-                camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview);
+                imageCapture = new ImageCapture.Builder()
+                        .build();
+
+                camera = cameraProvider.bindToLifecycle(this, cameraSelector, imageCapture, preview);
                 if (preview != null) {
                     preview.setSurfaceProvider(viewFinder.createSurfaceProvider());
                 }
@@ -96,5 +109,30 @@ public class MainActivity extends AppCompatActivity {
                 log.error("Error processing camera request", e);
             }
         }, ContextCompat.getMainExecutor(this));
+    }
+
+    private void takePhoto() {
+        File photoFile = new File(getOutputDirectory(),
+                fileFormat.format(System.currentTimeMillis()) + ".jpg");
+        ImageCapture.OutputFileOptions outputFileOptions = new ImageCapture.OutputFileOptions.Builder(photoFile)
+                .build();
+
+        imageCapture.takePicture(outputFileOptions, ContextCompat.getMainExecutor(this), new ImageCapture.OnImageSavedCallback() {
+            @Override
+            public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
+                Uri savedFile = Uri.fromFile(photoFile);
+                log.debug("Photo saved to {}", savedFile.toString());
+                Toast.makeText(getApplicationContext(), savedFile.toString(), Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onError(@NonNull ImageCaptureException exception) {
+                Toast.makeText(getApplicationContext(), "Error saving image", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private File getOutputDirectory() {
+        return getFilesDir();
     }
 }
