@@ -1,11 +1,13 @@
 package com.microsoft.garage.hearsee.service;
 
+import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.microsoft.azure.cognitiveservices.vision.computervision.ComputerVisionClient;
 import com.microsoft.azure.cognitiveservices.vision.computervision.models.ImageAnalysis;
 import com.microsoft.azure.cognitiveservices.vision.computervision.models.VisualFeatureTypes;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 import java.util.List;
 
@@ -44,6 +46,19 @@ public class AzureImageAnalyzer implements ImageAnalyzer {
                     .withUrl(url)
                     .withVisualFeatures(FEATURE_TYPES)
                     .execute()
+        ).subscribeOn(Schedulers.io());
+    }
+
+    @Override
+    public Observable<ImageAnalysis> analyze(Bitmap bitmap) {
+        ByteArrayOutputStream bitmapStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bitmapStream);
+
+        return Observable.fromCallable(() ->
+                computerVisionClient.get().computerVision()
+                        .analyzeImageInStream()
+                        .withImage(bitmapStream.toByteArray())
+                        .execute()
         ).subscribeOn(Schedulers.io());
     }
 }
