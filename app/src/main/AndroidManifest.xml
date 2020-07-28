@@ -17,6 +17,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.microsoft.garage.HearSeeApp.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/files_path"></meta-data>
+        </provider>
         <activity android:name=".activities.ImageViewActivity"></activity>
         <activity android:name=".activities.MainActivity">
             <intent-filter>

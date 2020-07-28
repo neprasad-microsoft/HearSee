@@ -1,21 +1,31 @@
 package com.microsoft.garage.hearsee.activities;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.exifinterface.media.ExifInterface;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.graphics.Rect;
+import android.media.ExifInterface;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
+import com.microsoft.azure.cognitiveservices.vision.computervision.models.BoundingRect;
+import com.microsoft.azure.cognitiveservices.vision.computervision.models.DetectedObject;
+import com.microsoft.azure.cognitiveservices.vision.computervision.models.ImageAnalysis;
 import com.microsoft.garage.hearsee.HearSeeApplication;
+import com.microsoft.garage.hearsee.ImageCustomView;
 import com.microsoft.garage.hearsee.R;
 import com.microsoft.garage.hearsee.service.ImageAnalyzer;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.inject.Inject;
 
@@ -25,8 +35,11 @@ import lombok.extern.slf4j.Slf4j;
 public class ImageViewActivity extends AppCompatActivity {
     public static final String EXTRA_IMAGE_URI = "com.microsoft.garage.hearsee.ImageViewActivity.imageUri";
 
-    private ImageView imageView;
+    private ImageCustomView imageView;
     private ProgressBar progressBar;
+    private ImageAnalysis analysisResult = null;
+    private ArrayList<Rect> analysedAreaList = new ArrayList<>();
+    private ArrayList<String> descriptionList = new ArrayList<>();
 
     @Inject
     ImageAnalyzer imageAnalyzer;
@@ -58,7 +71,8 @@ public class ImageViewActivity extends AppCompatActivity {
                     matrix.postRotate(90);
                     break;
             }
-            Bitmap sourceBitmap = BitmapFactory.decodeFile(imagePath);
+           Bitmap sourceBitmap = BitmapFactory.decodeFile(imagePath); // BitmapFactory.decodeResource(getResources(), R.drawable.test_image)
+
             Bitmap bitmap = Bitmap.createBitmap(sourceBitmap, 0, 0, sourceBitmap.getWidth(), sourceBitmap.getHeight(), matrix, true);
 
             analyzeImage(bitmap);
@@ -71,14 +85,39 @@ public class ImageViewActivity extends AppCompatActivity {
     }
 
     private void analyzeImage(Bitmap bitmap) {
+        imageView.setImageAlpha(100);
         imageAnalyzer.analyze(bitmap)
                 .subscribe(imageAnalysis -> {
                     log.debug("Image analysis complete: {}", imageAnalysis);
-
                     // TODO: Render squares that use TTS
 
                     // Hide progress
                     progressBar.setVisibility(View.INVISIBLE);
+                    imageView.setImageAlpha(255);
+
+                    descriptionList.clear();
+                    analysedAreaList.clear();
+                    if (imageAnalysis.objects() != null){
+                        for (DetectedObject detectedObject : imageAnalysis.objects()){
+                            BoundingRect bRect = detectedObject.rectangle();
+                            Rect r = new Rect(bRect.x(), bRect.y(), bRect.x() + bRect.w(), bRect.y() + bRect.h());
+                            analysedAreaList.add(r);
+                            descriptionList.add(detectedObject.objectProperty());
+                        }
+                        imageView.setAnalysedAreaList(analysedAreaList);
+                        imageView.setObjectDescriptionList(descriptionList);
+                        imageView.invalidate();
+                    }
                 });
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Intent intent = new Intent(ImageViewActivity.this,MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // remove all the previous activities
+        startActivity(intent);
+
+    }
+
 }
