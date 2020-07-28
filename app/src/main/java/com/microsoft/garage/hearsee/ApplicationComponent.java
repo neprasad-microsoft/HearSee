@@ -2,6 +2,7 @@ package com.microsoft.garage.hearsee;
 
 import android.app.Application;
 
+import com.microsoft.garage.hearsee.activities.ImageViewActivity;
 import com.microsoft.garage.hearsee.activities.MainActivity;
 import com.microsoft.garage.hearsee.modules.BasicModule;
 import com.microsoft.garage.hearsee.modules.ComputerVisionModule;
@@ -24,4 +25,5 @@ public interface ApplicationComponent {
     }
 
     void inject(MainActivity activity);
+    void inject(ImageViewActivity activity);
 }

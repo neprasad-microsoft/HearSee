@@ -13,23 +13,22 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.microsoft.garage.hearsee.HearSeeApplication;
 import com.microsoft.garage.hearsee.R;
-import com.microsoft.garage.hearsee.service.ImageAnalyzer;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.stream.Stream;
-
-import javax.inject.Inject;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -42,12 +41,8 @@ public class MainActivity extends AppCompatActivity {
             Manifest.permission.INTERNET
     };
 
-    @Inject
-    ImageAnalyzer imageAnalyzer;
-
     private Preview preview;
     private PreviewView viewFinder;
-    private FloatingActionButton cameraCaptureButton;
     private Camera camera;
     private ImageCapture imageCapture;
     private final SimpleDateFormat fileFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS", Locale.US);
@@ -59,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         viewFinder = findViewById(R.id.viewFinder);
-        cameraCaptureButton = findViewById(R.id.cameraCaptureButton);
+        FloatingActionButton cameraCaptureButton = findViewById(R.id.cameraCaptureButton);
 
         cameraCaptureButton.setOnClickListener(button -> takePhoto());
 
@@ -120,9 +115,11 @@ public class MainActivity extends AppCompatActivity {
         imageCapture.takePicture(outputFileOptions, ContextCompat.getMainExecutor(this), new ImageCapture.OnImageSavedCallback() {
             @Override
             public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
-                Uri savedFile = Uri.fromFile(photoFile);
-                log.debug("Photo saved to {}", savedFile.toString());
-                Toast.makeText(getApplicationContext(), savedFile.toString(), Toast.LENGTH_LONG).show();
+                log.debug("Photo saved to {}", photoFile.toString());
+
+                Intent imageViewIntent = new Intent(getApplicationContext(), ImageViewActivity.class);
+                imageViewIntent.putExtra(ImageViewActivity.EXTRA_IMAGE_URI, photoFile.toString());
+                startActivity(imageViewIntent);
             }
 
             @Override
