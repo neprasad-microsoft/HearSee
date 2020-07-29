@@ -35,7 +35,7 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-
+    implementation 'com.microsoft.cognitiveservices.speech:client-sdk:1.13.0'
     def lombok_version = "1.18.12"
     compileOnly "org.projectlombok:lombok:${lombok_version}"
     annotationProcessor "org.projectlombok:lombok:${lombok_version}"
@@ -55,6 +55,8 @@ dependencies {
 
     implementation 'com.microsoft.azure:azure-client-runtime:1.7.5'
     implementation 'com.microsoft.azure.cognitiveservices:azure-cognitiveservices-computervision:1.0.4-beta'
+
+
 
     implementation 'com.google.guava:guava:29.0-android'
 
