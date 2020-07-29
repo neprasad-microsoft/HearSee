@@ -6,13 +6,15 @@ import com.microsoft.garage.hearsee.activities.ImageViewActivity;
 import com.microsoft.garage.hearsee.activities.MainActivity;
 import com.microsoft.garage.hearsee.modules.BasicModule;
 import com.microsoft.garage.hearsee.modules.ComputerVisionModule;
+import com.microsoft.garage.hearsee.modules.SpeechSynthesizerModule;
 
 import dagger.BindsInstance;
 import dagger.Component;
 
 @Component(modules = {
         BasicModule.class,
-        ComputerVisionModule.class
+        ComputerVisionModule.class,
+        SpeechSynthesizerModule.class
 })
 public interface ApplicationComponent {
 

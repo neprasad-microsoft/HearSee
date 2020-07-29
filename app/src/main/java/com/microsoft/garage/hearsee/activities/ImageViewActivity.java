@@ -23,6 +23,7 @@ import com.microsoft.garage.hearsee.HearSeeApplication;
 import com.microsoft.garage.hearsee.ImageCustomView;
 import com.microsoft.garage.hearsee.R;
 import com.microsoft.garage.hearsee.service.ImageAnalyzer;
+import com.microsoft.garage.hearsee.service.SpeechService;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -43,6 +44,9 @@ public class ImageViewActivity extends AppCompatActivity {
 
     @Inject
     ImageAnalyzer imageAnalyzer;
+
+    @Inject
+    SpeechService speechService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +82,7 @@ public class ImageViewActivity extends AppCompatActivity {
             analyzeImage(bitmap);
 
             imageView.setImageBitmap(bitmap);
+            speechService.speak("Hello world!");
         } catch (IOException e) {
             // Ignore
             log.error("Error getting EXIF interface", e);

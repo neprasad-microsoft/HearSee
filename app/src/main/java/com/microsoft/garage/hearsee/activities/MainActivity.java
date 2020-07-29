@@ -19,7 +19,6 @@ import android.widget.Toast;
 
 import com.microsoft.garage.hearsee.HearSeeApplication;
 import com.microsoft.garage.hearsee.R;
-import com.microsoft.garage.hearsee.service.AzureSpeechSynthesizer;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,11 +32,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class MainActivity extends AppCompatActivity {
-
-
-    private static AzureSpeechSynthesizer azspeechsynthesizer = new AzureSpeechSynthesizer();
-
-
     private static final int REQUEST_CODE_PERMISSIONS = 10;
     static final int CAPTURE_IMAGE_REQUEST = 1;
     static final String APP_FILE_PROVIDER = "com.microsoft.garage.HearSeeApp.fileprovider";
@@ -57,9 +51,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (allPermissionsGranted()) {
             String speech = "Hello, How are you?";
-            azspeechsynthesizer.speak(speech);
             startCameraAndTakePhoto();
-
         } else {
             ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS);
         }
