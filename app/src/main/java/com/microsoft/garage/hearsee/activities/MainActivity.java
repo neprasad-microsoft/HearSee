@@ -50,7 +50,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         if (allPermissionsGranted()) {
-            String speech = "Hello, How are you?";
             startCameraAndTakePhoto();
         } else {
             ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS);

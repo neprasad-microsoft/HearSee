@@ -28,4 +28,5 @@ public interface ApplicationComponent {
 
     void inject(MainActivity activity);
     void inject(ImageViewActivity activity);
+    void inject(ImageCustomView activity);
 }

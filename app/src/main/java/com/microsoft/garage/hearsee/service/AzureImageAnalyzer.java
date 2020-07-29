@@ -7,6 +7,7 @@ import com.microsoft.azure.cognitiveservices.vision.computervision.ComputerVisio
 import com.microsoft.azure.cognitiveservices.vision.computervision.models.ImageAnalysis;
 import com.microsoft.azure.cognitiveservices.vision.computervision.models.VisualFeatureTypes;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 import java.util.List;
@@ -53,11 +54,12 @@ public class AzureImageAnalyzer implements ImageAnalyzer {
     public Observable<ImageAnalysis> analyze(Bitmap bitmap) {
         ByteArrayOutputStream bitmapStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bitmapStream);
-
         return Observable.fromCallable(() ->
+
                 computerVisionClient.get().computerVision()
                         .analyzeImageInStream()
                         .withImage(bitmapStream.toByteArray())
+                        .withVisualFeatures(FEATURE_TYPES)
                         .execute()
         ).subscribeOn(Schedulers.io());
     }

@@ -13,17 +13,20 @@
         android:layout_height="match_parent"
         android:adjustViewBounds="true"
         android:contentDescription="@string/captured_image"
-        android:scaleType="fitCenter"
+        android:scaleType="fitXY"
         android:visibility="visible" />
 
     <ProgressBar
         android:id="@+id/progressBar"
         style="?android:attr/progressBarStyle"
-        android:layout_width="164dp"
-        android:layout_height="83dp"
-        android:layout_marginHorizontal="150dp"
-        android:layout_marginVertical="300dp"
-        android:scaleType="center"
-        tools:layout_editor_absoluteX="181dp"
-        tools:layout_editor_absoluteY="341dp" />
+        android:layout_width="600dp"
+        android:layout_height="600dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="130dp"
+        android:layout_marginTop="270dp"
+        android:layout_marginEnd="130dp"
+        android:layout_marginBottom="270dp" />
 </RelativeLayout>

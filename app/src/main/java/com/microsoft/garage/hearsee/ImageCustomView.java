@@ -9,28 +9,39 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.microsoft.garage.hearsee.service.SpeechService;
+
 import java.util.ArrayList;
+
+import javax.inject.Inject;
 
 public class ImageCustomView extends androidx.appcompat.widget.AppCompatImageView {
     private static final String TAG = ImageCustomView.class.getSimpleName();
+    private static final String NO_OBJECT_FOUND = "Sorry! No object found.";
 
     private ArrayList<Rect> mSavedAreaList = new ArrayList<>();
     private ArrayList<String> mObjectDescriptionList = new ArrayList<>();
     private Paint mPaint;
 
+    @Inject
+    SpeechService speechService;
+
+
     public ImageCustomView(Context context) {
         super(context);
-        init();
+        init(context);
     }
 
     public ImageCustomView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init();
+        init(context);
     }
 
     public ImageCustomView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
+        init(context);
     }
 
     public boolean setAnalysedAreaList(ArrayList<Rect> boundList){
@@ -41,7 +52,8 @@ public class ImageCustomView extends androidx.appcompat.widget.AppCompatImageVie
         return mObjectDescriptionList.addAll(descriptionList);
     }
 
-    private void init() {
+    private void init(Context context) {
+        ((HearSeeApplication) ((AppCompatActivity) context).getApplication()).applicationComponent.inject(this);
         mPaint = new Paint();
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeWidth(10);
@@ -60,24 +72,20 @@ public class ImageCustomView extends androidx.appcompat.widget.AppCompatImageVie
 
     @Override
     public boolean onTouchEvent(MotionEvent event){
-        StringBuilder sb = new StringBuilder();
-        sb.append("Rectangle: ");
-        int i = 1;
-        for (Rect rect: mSavedAreaList){
-            if (rect.contains((int)event.getX(), (int)event.getY())){
-                sb.append(i);
-                break;
+        if (event.getAction() == MotionEvent.ACTION_DOWN){
+            int i = 1;
+            for (Rect rect: mSavedAreaList){
+                if (rect.contains((int)event.getX(), (int)event.getY())){
+                    break;
+                }
+                i++;
             }
-            i++;
+            if (i > mSavedAreaList.size() || mSavedAreaList.size() != mObjectDescriptionList.size()){
+                speechService.speak(NO_OBJECT_FOUND);
+            } else {
+                speechService.speak(mObjectDescriptionList.get(i-1));
+            }
         }
-        if (i > mSavedAreaList.size() || mSavedAreaList.size() != mObjectDescriptionList.size()){
-            sb.append("Not Found Or Size mismatch");
-        } else {
-            sb.append(" Description: ");
-            sb.append(mObjectDescriptionList.get(i-1));
-        }
-
-        Toast.makeText(getContext(), sb.toString(), Toast.LENGTH_LONG).show();
         return true;
     }
 }
