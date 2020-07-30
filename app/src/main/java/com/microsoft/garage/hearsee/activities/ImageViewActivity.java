@@ -115,7 +115,12 @@ public class ImageViewActivity extends AppCompatActivity {
                         imageView.setAnalysedAreaList(analysedAreaList);
                         imageView.setObjectDescriptionList(descriptionList);
                         String description = imageAnalysis.description().captions().get(0).text();
-                        speechService.speak(description);
+                        if (imageAnalysis.objects().size() == 0){
+                            speechService.speak("Oops! No objects detected, but, it feels like " + description);
+                        }
+                        else {
+                            speechService.speak(description);
+                        }
                         imageView.invalidate();
                     }
                 });
